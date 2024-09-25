@@ -76,8 +76,8 @@ df <- df %>%
   filter(DIQ010 %in% c(1, 2), DRD370B %in% c(1, 2)) %>%
   # Recode 1 to "Yes" and 2 to "No" for DIQ010 and DRD360
   mutate(
-    DIQ010 = ifelse(DIQ010 == 1, "Yes", "No"),
-    DRD370B = ifelse(DRD370B == 1, "Yes", "No")
+    DIQ010 = ifelse(DIQ010 == 1, "Has Diabetes", "No Diabetes"), #"has diabetes was first 'yes'
+    DRD370B = ifelse(DRD370B == 1, "Consumes Ahi", "No Ahi") #was 'yes' and 'no'
   )
   
 ```
@@ -92,3 +92,89 @@ df <- df %>%
 6.  Determine posterior probability via bayes theorem
     -   P(B\|A)
 7.  What other questions can we ask of this data?
+
+#### P(B)
+
+```{r}
+df %>%
+  tabyl(DIQ010)
+```
+
+#### L(B/A) = P(A/B)
+
+```{r}
+df %>%
+  tabyl(DRD370B, DIQ010) %>%
+  adorn_percentages("col") #not row 
+```
+
+#### P(A)
+
+```{r}
+df %>%
+  tabyl(DRD370B)
+```
+
+```{r}
+df %>%
+  tabyl(DIQ010)
+```
+
+```{r}
+probability_has_diabetes <- 0.13
+```
+
+```{r}
+##l(b|a)
+probability_consumes_ahi_given_diabetes <- 0.36
+```
+
+```{r}
+##p|a
+probability_consumes_ahi <- 0.36
+```
+
+#### P(B\\A)
+
+```{r}
+(probability_has_diabetes * probability_consumes_ahi_given_diabetes) / probability_consumes_ahi 
+```
+
+#### Diabetes & Age
+
+```{r}
+demographics <- demographics %>%
+  select(SEQN, RIDRETH1, RIAGENDR, RIDAGEYR)
+```
+
+```{r}
+nhanes_data <- left_join(df, demographics, by = "SEQN")
+```
+
+```{r}
+nhanes_data <- nhanes_data %>%
+  mutate(age_bracket = ifelse(RIDAGEYR > 40, "old", "young"))
+```
+
+```{r}
+ggplot(nhanes_data, aes(x = RIDAGEYR, fill = DIQ010)) + geom_density(alpha = 0.5)
+```
+
+#### HOMEWORK
+
+```{r}
+##p(a)
+likelihood_old_given_diabetes <- 0.96
+
+nhanes_data %>%
+  tabyl(age_bracket)
+
+probability_old <- 0.53
+```
+
+## p(b/a)
+
+```{r}
+#answer should be 0.235...
+(probability_has_diabetes * likelihood_old_given_diabetes) / probability_old
+```
