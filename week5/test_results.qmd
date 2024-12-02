@@ -71,10 +71,6 @@ patients <- patients %>%
       TRUE ~ "negative"
     )
   )
-
-
-
-
 ```
 
 #### Apply Bayes Theorem in Class
@@ -87,7 +83,7 @@ patients %>%
 ```
 
 ```{r}
-probability_positive_test_result_
+probability_disease <- 0.001
 ```
 
 ```{r}
